@@ -23,7 +23,7 @@ END:VCARD`
 };
 
 cmd({
-  pattern: "tts2",
+  pattern: "tts3",
   desc: "Convert text to speech with different voices.",
   category: "fun",
   react: "🔊",
@@ -76,7 +76,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 
 
 cmd({
-  pattern: "tts3",
+  pattern: "tts4",
   desc: "Convert text to speech with different voices.",
   category: "fun",
   react: "🔊",
