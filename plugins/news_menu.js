@@ -1,7 +1,6 @@
 const axios = require('axios');
 const { cmd } = require('../command');
 
-// Menu Image
 const menuImage = "https://files.catbox.moe/t66qvb.jpg";
 
 // Fake vCard
@@ -32,7 +31,7 @@ cmd({
     react: "📰",
     filename: __filename
 },
-async (conn, mek, m, { from, reply }) => {
+async (conn, mek, m, { from }) => {
 
     let menuText = `
 📰 *NEWS MENU*
@@ -40,7 +39,7 @@ async (conn, mek, m, { from, reply }) => {
 1️⃣ Sirasa News  
 2️⃣ BBC News  
 
-👉 Reply with number (1 or 2)
+👉 Reply with *1* or *2*
 `;
 
     await conn.sendMessage(from, {
@@ -51,80 +50,147 @@ async (conn, mek, m, { from, reply }) => {
 });
 
 
-// HANDLE REPLY (number select)
+// HANDLE REPLY
 cmd({
     on: "text"
 },
 async (conn, mek, m, { from, body, reply }) => {
 
+    if (!m.quoted) return;
+
+    let quotedText = m.quoted.text || "";
+
+    // Only trigger if replying to our menu
+    if (!quotedText.includes("NEWS MENU")) return;
+
     if (body === "1") {
-        return await sendSirasaNews(conn, from, reply);
+        return await sendSirasa(conn, from, m);
     }
 
     if (body === "2") {
-        return await sendBBCNews(conn, from, reply);
+        return await sendBBC(conn, from, m);
     }
 
 });
 
 
-// Sirasa News Function
-async function sendSirasaNews(conn, from, reply) {
+// 🔵 Sirasa News
+async function sendSirasa(conn, from, m) {
     try {
+
+        // ⏳ React (Processing)
+        await conn.sendMessage(from, {
+            react: { text: "⏳", key: m.key }
+        });
+
         const res = await axios.get("https://appi.srihub.store/news/sirasa?apikey=dew_1TqE8N6MtFQH7myhpydg9K0XCgjNJVwyUJEE0Pic");
 
-        if (!res.data.status) return reply("❌ Failed to fetch Sirasa news");
+        if (!res.data.status) {
+            await conn.sendMessage(from, {
+                react: { text: "❌", key: m.key }
+            });
+            return;
+        }
 
         const newsList = Array.isArray(res.data.result) ? res.data.result : [res.data.result];
 
         for (let news of newsList) {
 
-            let msg = `📰 *${news.title}*\n\n📅 ${news.date}\n\n${news.desc}\n\n🔗 ${news.url}`;
+            let msg = `
+📰 *${news.title}*
+
+📅 ${news.date}
+
+${news.desc}
+
+🔗 ${news.url}
+
+> © Powered by RANUMITHA-X-MD 🌛
+            `;
 
             if (news.image) {
                 await conn.sendMessage(from, {
                     image: { url: news.image },
                     caption: msg
-                }, { quoted: fakevCard });
+                });
             } else {
-                await conn.sendMessage(from, { text: msg }, { quoted: fakevCard });
+                await conn.sendMessage(from, { text: msg });
             }
 
             await new Promise(r => setTimeout(r, 500));
         }
 
+        // ✅ Success React
+        await conn.sendMessage(from, {
+            react: { text: "✅", key: m.key }
+        });
+
     } catch (err) {
-        reply("❌ Error loading Sirasa news");
+        console.log(err);
+
+        await conn.sendMessage(from, {
+            react: { text: "❌", key: m.key }
+        });
     }
 }
 
 
-// BBC News Function
-async function sendBBCNews(conn, from, reply) {
+// 🔴 BBC News
+async function sendBBC(conn, from, m) {
     try {
+
+        // ⏳ React
+        await conn.sendMessage(from, {
+            react: { text: "⏳", key: m.key }
+        });
+
         const res = await axios.get("https://appi.srihub.store/news/bbc?apikey=dew_1TqE8N6MtFQH7myhpydg9K0XCgjNJVwyUJEE0Pic");
 
-        if (!res.data.status) return reply("❌ Failed to fetch BBC news");
+        if (!res.data.status) {
+            await conn.sendMessage(from, {
+                react: { text: "❌", key: m.key }
+            });
+            return;
+        }
 
         const newsList = Array.isArray(res.data.result) ? res.data.result : [res.data.result];
 
         for (let news of newsList) {
 
-            let msg = `📰 *${news.title}*\n\n📅 ${news.date}\n\n${news.desc}\n\n🔗 ${news.url}`;
+            let msg = `
+📰 *${news.title}*
+
+📅 ${news.date}
+
+${news.desc}
+
+🔗 ${news.url}
+
+> © Powered by RANUMITHA-X-MD 🌛
+            `;
 
             if (news.image) {
                 await conn.sendMessage(from, {
                     image: { url: news.image },
                     caption: msg
-                }, { quoted: fakevCard });
+                });
             } else {
-                await conn.sendMessage(from, { text: msg }, { quoted: fakevCard });
+                await conn.sendMessage(from, { text: msg });
             }
 
             await new Promise(r => setTimeout(r, 500));
         }
 
+        // ✅ Success React
+        await conn.sendMessage(from, {
+            react: { text: "✅", key: m.key }
+        });
+
     } catch (err) {
-        reply("❌ Error loading BBC news");
+        console.log(err);
+
+        await conn.sendMessage(from, {
+            react: { text: "❌", key: m.key }
+        });
     }
-                                 }
+}
