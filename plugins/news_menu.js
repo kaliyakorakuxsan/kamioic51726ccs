@@ -26,7 +26,7 @@ END:VCARD`
 
 // MENU COMMAND
 cmd({
-    pattern: "news",
+    pattern: "newsmenu",
     desc: "News menu",
     category: "news",
     react: "📰",
