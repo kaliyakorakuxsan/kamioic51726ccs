@@ -75,7 +75,7 @@ ${news.desc}
 
         await conn.sendMessage(from, {
             text: "✅ *All news sent successfully!*"
-        }, { quoted: fakevCard });
+        });
 
     } catch (err) {
         console.error(err);
