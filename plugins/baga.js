@@ -1,58 +1,85 @@
-case 'systemx':
-case 'sysx':
-case 'infox': {
-  const { cmd, commands } = require('../command');
-  const os = require('os');
-    
-    try {
-        await socket.sendMessage(from, { react: { text: "⚙️", key: msg.key } });
+const config = require('../config');
+const { cmd } = require('../command');
+const os = require("os");
 
-        // 1. System Info Data (RAM, Uptime, OS)
+// Fake vCard (optional – alive එක වගේ use කරන්න පුළුවන්)
+const fakevCard = {
+    key: {
+        fromMe: false,
+        participant: "0@s.whatsapp.net",
+        remoteJid: "status@broadcast"
+    },
+    message: {
+        contactMessage: {
+            displayName: "© Mr Hiruka",
+            vcard: `BEGIN:VCARD
+VERSION:3.0
+FN:System
+ORG:WHITESHADOW MD;
+TEL;type=CELL;type=VOICE;waid=94762095304:+94762095304
+END:VCARD`
+        }
+    }
+};
+
+cmd({
+    pattern: "systemx",
+    alias: ["sysx", "infox"],
+    react: "⚙️",
+    desc: "Show system info",
+    category: "main",
+    filename: __filename
+},
+async (robin, mek, m, {
+    from, sender, reply
+}) => {
+    try {
+        await robin.sendPresenceUpdate('recording', from);
+
+        // 🧠 System Data
         const processUptime = process.uptime();
         const uptimeStr = `${Math.floor(processUptime / 3600)}h ${Math.floor((processUptime % 3600) / 60)}m ${Math.floor(processUptime % 60)}s`;
+
         const usedRam = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
         const totalRam = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2);
-        
+
         const sysText = `╭━━━〔 ⚙️ *SYSTEM INFO* 〕━━━╮
 ┃ 🤖 *BOT:* RANUMITHA-X-MD
 ┃ ⏱️ *UPTIME:* ${uptimeStr}
 ┃ 💾 *RAM:* ${usedRam} MB / ${totalRam} GB
 ┃ 🖥️ *OS:* ${os.type()} ${os.release()}
+┃ 🖥️ *HOST:* ${os.hostname()}
 ╰━━━━━━━━━━━━━━━━━━━━━╯
 
-> *Powered by Whiteshadow MD Mini* 🚀`;
+> *Powered by WHITESHADOW MD* 🚀`;
 
-        // 2. Sticker එකක් Quote කරලා තිබුණොත් ඒක ලබා ගැනීම (Optional)
+        // Sticker (optional)
         let quotedSticker = null;
-        if (msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.stickerMessage) {
-            quotedSticker = msg.message.extendedTextMessage.contextInfo.quotedMessage.stickerMessage;
+        if (mek.message?.extendedTextMessage?.contextInfo?.quotedMessage?.stickerMessage) {
+            quotedSticker = mek.message.extendedTextMessage.contextInfo.quotedMessage.stickerMessage;
         }
 
-        // 3. Payment Request Message Style
-        await socket.sendMessage(from, {
+        // 💸 Payment Style Message
+        await robin.sendMessage(from, {
             requestPaymentMessage: {
-                currencyCodeIso4217: 'USD', // Baileys standard
-                amount1000: 499000,         // $49.90 (Baileys standard)
-                currency: 'USD',            // (Fallback from your snippet)
-                amount: 49900,              // (Fallback from your snippet)
+                currencyCodeIso4217: 'USD',
+                amount1000: 499000,
                 requestFrom: sender,
-                from: sender,
                 noteMessage: {
                     extendedTextMessage: {
                         text: sysText,
                         contextInfo: {
-                            // Channel Forward Style එක මෙතනින් යෙදේ
                             forwardingScore: 999,
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
                                 newsletterJid: '120363317972190466@newsletter',
-                                newsletterName: '𝐖𝐇𝐈𝐓𝐄𝐒𝐇𝐀𝐃𝐎𝐖 𝐌𝐃',
+                                newsletterName: 'WHITESHADOW MD',
                                 serverMessageId: 143
                             }
                         }
                     }
                 },
-                sticker: quotedSticker, // Reply කරපු ස්ටිකරයක් තිබුණොත් එකතු වේ
+                sticker: quotedSticker || undefined,
                 background: {
                     id: 'bg-001',
                     fileLength: '1024',
@@ -64,13 +91,10 @@ case 'infox': {
                     subtextArgb: 0xFFAA00FF
                 }
             }
-        }, { quoted: msg });
-
-        await socket.sendMessage(from, { react: { text: "✅", key: msg.key } });
+        }, { quoted: fakevCard });
 
     } catch (e) {
-        console.error("System Cmd Error:", e);
-        await socket.sendMessage(from, { text: `❌ *System Info Error:* ${e.message}` }, { quoted: msg });
+        console.log("SystemX Error:", e);
+        reply(`❌ Error: ${e.message}`);
     }
-    break;
-                      }
+});
