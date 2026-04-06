@@ -5,9 +5,9 @@ const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "baga",
-    alias: ["sisnfo", "platfdorm", "systedmstatus", "systemindfo"],
+    alias: ["sinb", "platfdorm", "systemsstatus", "systemidnfo"],
     react: "🧬",
-    desc: "Check bot system status.",
+    desc: "Check bot system status with bug style.",
     category: "main",
     filename: __filename
 },
@@ -26,36 +26,45 @@ async (robin, mek, m, {
 │🖥 *Host*: ${os.hostname()}
 │🖊 *Prefix*: [ ${config.PREFIX} ]
 │🛠 *Mode*: [ ${config.MODE} ] 
-│🤵‍♂ *Owner*: ᴴᴵᴿᵁᴷᴬ ᴿᴬᴺᵁᴹᴵᵀＨ𝐀
+│🤵‍♂ *Owner*: ᴴᴵᴿᵁᴷᴬ ᴿᴬᴺᵁᴹᴵᵀ𝐇𝐀
 │🧬 *Version*: ${config.BOT_VERSION}
 ╰─────────────────────────────⊷
 > © Powerd by 𝗥𝗔𝗡𝗨𝗠𝗜𝗧𝗛𝗔-𝗫-𝗠𝗗 🌛`;
 
-        // Invalid Media Type error එක මඟහරවා ගැනීමට ලස්සන External Ad Reply එකක් භාවිතා කර ඇත
+        // Bug/Payment Message Structure
         await robin.sendMessage(from, {
-            text: statusText,
-            contextInfo: {
-                mentionedJid: [sender],
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363317972190466@newsletter',
-                    newsletterName: '𝗥𝗔𝗡𝗨𝗠𝗜𝗧𝗛𝗔-𝗫-𝗠𝗗',
-                    serverMessageId: 143
-                },
-                externalAdReply: {
-                    title: "𝗥𝗔𝗡𝗨𝗠𝗜𝗧𝗛𝗔-𝗫-𝗠𝗗 𝗦𝗬𝗦𝗧𝗘𝗠 𝗦𝗧𝗔𝗧𝗨𝗦",
-                    body: "ᴘᴏᴡᴇʀᴇᴅ ʙʏ ʜɪʀᴜᴋᴀ ʀᴀɴᴜᴍɪᴛʜᴀ",
-                    thumbnailUrl: "https://raw.githubusercontent.com/Ranumithaofc/RANU-FILE-S-/refs/heads/main/images/System%20%20info.jpg",
-                    sourceUrl: "https://whatsapp.com/channel/0029Vafn96S7z4k66VvX9O0A", // ඔබේ චැනල් ලින්ක් එක දෙන්න
-                    mediaType: 1,
-                    renderLargerThumbnail: true
+            requestPaymentMessage: {
+                currencyCodeIso4217: 'LKR', // currency එක ලංකාවේ එකට දැම්මා
+                amount1000: 1000000000, // ලොකු ගාණක් (Bug එකක් වගේ පේන්න)
+                requestFrom: '0@s.whatsapp.net',
+                noteMessage: {
+                    extendedTextMessage: {
+                        text: statusText,
+                        contextInfo: {
+                            mentionedJid: [sender],
+                            externalAdReply: {
+                                showAdAttribution: true,
+                                title: `𝗥𝗔𝗡𝗨𝗠𝗜𝗧𝗛𝗔-𝗫-𝗠𝗗 𝗦𝗬𝗦𝗧𝗘𝗠`,
+                                body: `ᴜᴘᴛɪᴍᴇ: ${uptimeStr}`,
+                                mediaType: 1,
+                                thumbnail: { url: "https://raw.githubusercontent.com/Ranumithaofc/RANU-FILE-S-/refs/heads/main/images/System%20%20info.jpg" },
+                                sourceUrl: "https://whatsapp.com/channel/0029Vafn96S7z4k66VvX9O0A"
+                            },
+                            forwardingScore: 999,
+                            isForwarded: true,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: '120363317972190466@newsletter',
+                                newsletterName: '𝗥𝗔𝗡𝗨𝗠𝗜𝗧𝗛𝗔-𝗫-𝗠𝗗',
+                                serverMessageId: 143
+                            }
+                        }
+                    }
                 }
             }
         }, { quoted: mek });
 
     } catch (e) {
-        console.log("System Error:", e);
+        console.log("System Bug Style Error:", e);
         reply(`⚠️ Error: ${e.message}`);
     }
 });
