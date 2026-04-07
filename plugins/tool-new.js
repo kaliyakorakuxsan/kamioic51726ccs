@@ -1,5 +1,5 @@
 const { sleep } = require('../lib/functions');
-const {cmd , commands} = require('../command');
+const {cmd , commands} = require('../command')
 const axios = require('axios'); 
 
 // Fake vCard
