@@ -1,5 +1,6 @@
 const { sleep } = require('../lib/functions');
-const {cmd , commands} = require('../command')
+const {cmd , commands} = require('../command');
+const axios = require('axios'); 
 
 // Fake vCard
 const fakevCard = {
@@ -625,27 +626,46 @@ cmd({
 });
 
 // 10. TIME IN ANY COUNTRY
-cmd({
+
+
+Cmd({
     pattern: "timein",
     alias: ["timeeka" ,"ctime" ,"countrytime"],
     react: "🕒",
-    desc: "Time in any country",
+    desc: "Time in any country or city",
     category: "utility"
 }, async (conn, mek, m, { reply, args }) => {
-    if (!args[0]) return reply("📌 Use: *.timein japan*");
+    // පරිශීලකයා රටක් හෝ නගරයක් ඇතුළත් කර නොමැති නම්
+    if (!args[0]) return reply("📌 Use: *.timein sri lanka* or *.timein new york*");
+
+    const location = args.join(" ");
+    const apiKey = 'ZuRyqX3oWW8ZhRO68B3Wc8xwwugfMGUfGWTCCQmd'; // ඔයාගේ API Key එක
 
     try {
-        const country = args.join(" ");
-        const time = new Date().toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: true,
-            timeZone: country
+        // API එක හරහා දත්ත ලබා ගැනීම
+        const response = await axios.get(`https://api.api-ninjas.com/v1/worldtime?city=${location}`, {
+            headers: { 'X-Api-Key': apiKey }
         });
 
-        reply(`🕒 *Time in ${country}:* ${time}`);
-    } catch {
-        reply("❌ Invalid country/timezone");
+        const data = response.data;
+        
+        if (data && data.datetime) {
+            // ලබාගත් දත්ත ලස්සනට පිළියෙළ කිරීම
+            let timeMsg = `🕒 *WORLD CLOCK* 🕒\n\n` +
+                         `📍 *Location:* ${location.toUpperCase()}\n` +
+                         `📅 *Date:* ${data.date}\n` +
+                         `⏰ *Time:* ${data.hour}:${data.minute}:${data.seconds}\n` +
+                         `🌐 *Timezone:* ${data.timezone}\n\n` +
+                         `*RANUMITHA-X-MD TIME SERVICE*`;
+            
+            reply(timeMsg);
+        } else {
+            reply("❌ රට හෝ නගරය සොයාගත නොහැක. කරුණාකර නම නිවැරදිව ටයිප් කරන්න.");
+        }
+
+    } catch (e) {
+        // මොකක් හරි error එකක් ආවොත් (උදා: API Key වැරදි නම්)
+        reply("❌ දත්ත ලබාගැනීමේදී දෝෂයක් සිදුවුණා. පසුව උත්සාහ කරන්න.");
+        console.error(e);
     }
 });
