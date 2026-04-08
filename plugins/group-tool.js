@@ -23,7 +23,7 @@ async (conn, mek, m, {
         // Get the bot owner's number dynamically
         const botOwner = conn.user.id.split(":")[0];
         if (senderNumber !== botOwner) {
-            return reply("Only the bot owner can use this command.");
+            return reply("*✅ Only the bot owner can use this command.*");
         }
 
         if (!isOwner) {
