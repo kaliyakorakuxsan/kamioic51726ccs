@@ -75,7 +75,7 @@ const countries = [
 // 📌 TIMELIST COMMAND
 cmd({
     pattern: "timelist",
-    alias: "tlist",
+    alias: ["tlist" ,"ctime" ,"countrytime"],
     desc: "World time list (195 countries)",
     category: "utility",
     react: "🫯",
