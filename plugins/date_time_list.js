@@ -1,5 +1,26 @@
 const { cmd } = require('../command');
 
+// Fake ChatGPT vCard
+const fakevCard = {
+    key: {
+        fromMe: false,
+        participant: "0@s.whatsapp.net",
+        remoteJid: "status@broadcast"
+    },
+    message: {
+        contactMessage: {
+            displayName: "© Mr Hiruka",
+            vcard: `BEGIN:VCARD
+VERSION:3.0
+FN:Meta
+ORG:META AI;
+TEL;type=CELL;type=VOICE;waid=94762095304:+94762095304
+END:VCARD`
+        }
+    }
+};
+
+
 // 🌍 GENERATE 195 COUNTRIES (ISO)
 const countries = Intl.supportedValuesOf("timeZone")
     .map(tz => {
@@ -14,12 +35,12 @@ cmd({
     pattern: "timelist",
     desc: "World time list (195 countries)",
     category: "utility",
-    react: "🌍",
+    react: "🫯",
     filename: __filename
 },
 async (conn, mek, m, { reply }) => {
 
-    let txt = "🌍 *WORLD TIME LIST*\n\n";
+    let txt = "🌍 *\`WORLD TIME LIST\`* ⏰\n\n";
     const now = new Date();
 
     for (let i = 0; i < countries.length; i++) {
@@ -39,10 +60,10 @@ async (conn, mek, m, { reply }) => {
             second: "2-digit"   // ✅ seconds added
         });
 
-        txt += `*${i + 1}.* ${c.name}\n📅 ${date} | 🕒 ${time}\n\n`;
+        txt += `*${i + 1}.* ${c.name}\n📅 \`${date}\` | 🕒 \`${time}\`\n\n`;
 
         if ((i + 1) % 25 === 0) {
-            await conn.sendMessage(m.chat, { text: txt }, { quoted: mek });
+            await conn.sendMessage(m.chat, { text: txt }, { quoted: fakevCard });
             txt = "";
         }
     }
