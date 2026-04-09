@@ -103,7 +103,7 @@ const countryList = [
 ];
 
 // --- Command Structure ---
-Cmd({
+cmd({
     pattern: "timelist",
     alias: ["countries", "worldlist"],
     react: "📑",
