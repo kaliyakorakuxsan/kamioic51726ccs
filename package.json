@@ -16,7 +16,7 @@
     "@vitalets/google-translate-api": "^9.2.1",
     "@dark-yasiya/scrap": "1.0.1",
     "pino": "latest",
-    "pm2": "^6.0.8",
+    "pm2": "^5.2.0",
     "util": "^0.12.5",
     "jimp": "latest",
     "express": "latest",
