@@ -15,7 +15,7 @@
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@vitalets/google-translate-api": "^9.2.1",
     "@dark-yasiya/scrap": "1.0.1",
-    "pino": "^9.5.0",
+    "pino": "latest",
     "pm2": "^6.0.8",
     "util": "^0.12.5",
     "jimp": "latest",
